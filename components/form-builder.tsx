@@ -36,6 +36,7 @@ import {
 import { FormField } from "./form-field"
 import { FormPreview } from "./form-preview"
 import dynamic from "next/dynamic"
+import { formStore } from "@/lib/form-store"
 
 // Dynamically import DragDropContext with ssr disabled
 const DragDropContext = dynamic(() => import("@hello-pangea/dnd").then((mod) => mod.DragDropContext), { ssr: false })
@@ -160,6 +161,10 @@ export function FormBuilder() {
   const handlePublish = () => {
     const uniqueId = Math.random().toString(36).substring(2, 15)
     const url = `/forms/${uniqueId}`
+
+    // Store the form data
+    formStore.addForm(uniqueId, formTitle, fields)
+
     setFormUrl(url)
     setPublishOpen(true)
   }
