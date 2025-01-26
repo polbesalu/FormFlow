@@ -1,6 +1,7 @@
 import "@/styles/globals.css"
 import { Inter } from "next/font/google"
 import { cn } from "@/lib/utils"
+import { FormProvider } from "@/lib/form-context"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -16,11 +17,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={cn(inter.className, "min-h-screen bg-background antialiased")}>{children}</body>
+      <body className={cn(inter.className, "min-h-screen bg-background antialiased")}>
+        <FormProvider>{children}</FormProvider>
+      </body>
     </html>
   )
 }
 
-
-
-import './globals.css'

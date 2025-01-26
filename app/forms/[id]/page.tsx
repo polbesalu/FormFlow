@@ -1,13 +1,24 @@
-import { formStore } from "@/lib/form-store"
+"use client"
+
+import { useFormContext } from "@/lib/form-context"
 import { FormPreview } from "@/components/form-preview"
 import { SiteHeader } from "@/components/site-header"
-import { notFound } from "next/navigation"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 export default function FormPage({ params }: { params: { id: string } }) {
-  const form = formStore.getForm(params.id)
+  const { getForm } = useFormContext()
+  const router = useRouter()
+  const form = getForm(params.id)
+
+  useEffect(() => {
+    if (!form) {
+      router.push("/forms/not-found")
+    }
+  }, [form, router])
 
   if (!form) {
-    notFound()
+    return null
   }
 
   return (
