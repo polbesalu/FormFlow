@@ -29,6 +29,7 @@ const FormContext = createContext<FormContextType | undefined>(undefined)
 
 export function FormProvider({ children }: { children: React.ReactNode }) {
   const [forms, setForms] = useState<Map<string, StoredForm>>(new Map())
+  const [isInitialized, setIsInitialized] = useState(false)
 
   // Load forms from localStorage on mount
   useEffect(() => {
@@ -36,6 +37,7 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
     if (storedForms) {
       setForms(new Map(JSON.parse(storedForms)))
     }
+    setIsInitialized(true)
   }, [])
 
   const addForm = (id: string, title: string, fields: FormField[]) => {
@@ -50,6 +52,10 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
 
   const getForm = (id: string) => {
     return forms.get(id)
+  }
+
+  if (!isInitialized) {
+    return null // or a loading indicator
   }
 
   return <FormContext.Provider value={{ forms, addForm, getForm }}>{children}</FormContext.Provider>
