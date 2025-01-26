@@ -35,7 +35,16 @@ import {
 } from "lucide-react"
 import { FormField } from "./form-field"
 import { FormPreview } from "./form-preview"
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd"
+import dynamic from "next/dynamic"
+
+// Dynamically import DragDropContext with ssr disabled
+const DragDropContext = dynamic(() => import("@hello-pangea/dnd").then((mod) => mod.DragDropContext), { ssr: false })
+
+// Dynamically import Droppable with ssr disabled
+const Droppable = dynamic(() => import("@hello-pangea/dnd").then((mod) => mod.Droppable), { ssr: false })
+
+// Dynamically import Draggable with ssr disabled
+const Draggable = dynamic(() => import("@hello-pangea/dnd").then((mod) => mod.Draggable), { ssr: false })
 
 interface FormField {
   id: string
@@ -95,6 +104,7 @@ export function FormBuilder() {
   const [selectedField, setSelectedField] = React.useState<FormField | null>(null)
   const [formTitle, setFormTitle] = React.useState("")
   const [formUrl, setFormUrl] = React.useState("")
+  const [origin, setOrigin] = React.useState("")
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -105,6 +115,7 @@ export function FormBuilder() {
     }
 
     document.addEventListener("keydown", down)
+    setOrigin(window.location.origin)
     return () => document.removeEventListener("keydown", down)
   }, [])
 
@@ -152,6 +163,12 @@ export function FormBuilder() {
     setFormUrl(url)
     setPublishOpen(true)
   }
+
+  const handleCopyUrl = React.useCallback(() => {
+    if (typeof window !== "undefined" && origin && formUrl) {
+      navigator.clipboard.writeText(`${origin}${formUrl}`)
+    }
+  }, [origin, formUrl])
 
   return (
     <main className="flex-1 overflow-y-auto">
@@ -251,6 +268,7 @@ export function FormBuilder() {
           </Command>
         </DialogContent>
       </Dialog>
+
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
         <DialogContent className="max-w-3xl">
           <FormPreview title={formTitle} fields={fields} />
@@ -264,16 +282,10 @@ export function FormBuilder() {
             <p>Your form is now available at:</p>
             <div className="flex items-center gap-2 p-2 bg-muted rounded-md">
               <code className="flex-1">
-                {window.location.origin}
+                {origin}
                 {formUrl}
               </code>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  navigator.clipboard.writeText(`${window.location.origin}${formUrl}`)
-                }}
-              >
+              <Button variant="ghost" size="sm" onClick={handleCopyUrl}>
                 Copy
               </Button>
             </div>

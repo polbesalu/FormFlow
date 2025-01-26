@@ -1,5 +1,9 @@
-import { FormBuilder } from "@/components/form-builder"
+import dynamic from "next/dynamic"
 import { SiteHeader } from "@/components/site-header"
+
+const FormBuilder = dynamic(() => import("@/components/form-builder").then((mod) => mod.FormBuilder), {
+  ssr: false,
+})
 
 export default function NewFormPage() {
   return (
